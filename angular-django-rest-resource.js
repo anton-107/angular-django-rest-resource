@@ -274,14 +274,22 @@ angular.module('djangoRESTResources', ['ng']).
       forEach(actions, function(action, name) {
         action.method = angular.uppercase(action.method);
         var hasBody = action.method == 'POST' || action.method == 'PUT' || action.method == 'PATCH';
-        DjangoRESTResource[name] = function(a1, a2, a3, a4) {
+        DjangoRESTResource[name] = function(a1, a2, a3, a4, a5) {
           var params = {};
           var data;
           var success = noop;
           var error = null;
+          var httpConfigOptions = {};
           var promise;
 
           switch(arguments.length) {
+          case 5:
+            params = a1;
+            data = a2;
+            success = a3;
+            error = a4;
+            httpConfigOptions = a5;
+          break;
           case 4:
             error = a4;
             success = a3;
@@ -335,7 +343,7 @@ angular.module('djangoRESTResources', ['ng']).
 
           function markResolved() { value.$resolved = true; }
 
-          promise = $http(httpConfig);
+          promise = $http(_.extend({}, httpConfig, httpConfigOptions));
           value.$resolved = false;
 
           promise.then(markResolved, markResolved);
